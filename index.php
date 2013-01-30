@@ -13,7 +13,7 @@ if ($uid) {
 
   $ps = $pdo->prepare("SELECT * FROM franchises WHERE id = ?");
   $ps->execute(array($user['home_franchise']));
-  $franchise = $ps->fetch(PDO::FETCH_ASSOC); 
+  $franchise = $ps->fetch(PDO::FETCH_ASSOC);
 }
 
 include 'bin/functions.php';
