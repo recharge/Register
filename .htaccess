@@ -1,0 +1,14 @@
+Options +MultiViews
+Options -Indexes
+Options +FollowSymLinks
+
+RewriteEngine On
+RewriteRule ^class/(.*)$ index.php?page=class&id=$1 [L]
+RewriteRule ^profile(.*)$ index.php?page=profile [L]
+RewriteRule ^children/(.*)$ index.php?page=children&id=$1 [L]
+RewriteRule ^registrations/(.*)$ index.php?page=registrations&id=$1 [L]
+RewriteRule ^classsheet/(.*)$ class_sheet.php?id=$1 [L]
+RewriteRule ^cart/(.*)$ index.php?page=cart&action=$1 [L]
+RewriteRule ^billing/(.*)$ index.php?page=billing [L,QSA]
+
+ErrorDocument 404 /index.php?error=404
