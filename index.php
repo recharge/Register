@@ -17,7 +17,7 @@ if ($uid) {
 }
 
 include 'bin/functions.php';
-include 'bin/actions.php';gi
+include 'bin/actions.php';
 
 if (!$user) {
 	$_SESSION['UID'] = $uid = "";
