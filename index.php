@@ -141,7 +141,7 @@ if ($user && ($user['emergency_contact_name'] == "" || $user['emergency_contact_
         <?php if ($franchise) { ?>
         <p class="center muted">Contact us! | <?php echo $franchise['name'] ?> | <?php echo formatphone($franchise['phone']) ?> | <?php echo $franchise['email'] ?></p>
         <?php } ?>
-        <p>&copy; 2012 KidzArt</p>
+        <p>&copy; 2013 KidzArt</p>
       </footer>
 
     </div> <!-- /container -->
