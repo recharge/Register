@@ -41,6 +41,7 @@ if ($user && ($user['emergency_contact_name'] == "" || $user['emergency_contact_
 
     <link href="/css/bootstrap.css" rel="stylesheet">
     <link href="/css/kidzart.css" rel="stylesheet" >
+    <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico">
     <style type="text/css">
       body {
         padding-top: 60px;

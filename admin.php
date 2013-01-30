@@ -42,6 +42,7 @@ include 'bin/actions.php';
     <link href="/css/bootstrap.css" rel="stylesheet">
     <link type="text/css" href="/css/redmond/jquery-ui-1.8.23.custom.css" rel="stylesheet" />
     <link href="/css/kidzart.css" rel="stylesheet" >
+    <link rel="shortcut icon" type="image/x-icon" href="/favicon.ico">
     <style type="text/css">
       body {
         padding-top: 60px;
