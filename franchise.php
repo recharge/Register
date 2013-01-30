@@ -152,7 +152,7 @@ if (!$user) {
       <hr>
 
       <footer>
-        <p>&copy; 2012 KidzArt</p>
+        <p>&copy; 2013 KidzArt</p>
       </footer>
 
     </div> <!-- /container -->
