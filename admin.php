@@ -14,7 +14,7 @@ if ($uid) {
 // remove the directory path we don't want 
 $request  = str_replace("/admin/", "", $_SERVER['REQUEST_URI']); 
 // split the path by '/'  
-$params     = @split("/", $request);
+$params     = @split("/", $request); 
 
 // filter out query string
 $qstring = $_SERVER['QUERY_STRING'];
@@ -105,7 +105,7 @@ include 'bin/actions.php';
       <hr>
 
       <footer>
-        <p>&copy; 2013 KidzArt</p>
+        <p>&copy; 2013 KidzzArt</p>
       </footer>
 
     </div> <!-- /container -->
