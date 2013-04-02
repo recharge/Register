@@ -342,7 +342,7 @@ $class = $params[1];
             <div class="control-group">
               <label for="inputEmail" class="control-label">Description</label>
               <div class="controls">
-              	<textarea name="description"><?php echo $class['description'] ?></textarea>
+              	<textarea name="description" rows="5" class="span9"><?php echo $class['description'] ?></textarea>
               </div>
             </div>
             

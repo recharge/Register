@@ -5,6 +5,8 @@
     $config = array();
     
 	$config['db']['dsn']                     = "mysql:host=kidzartrds.cfdeoujljpwn.us-east-1.rds.amazonaws.com;dbname=Register";
+	$config['db']['host']                    = "kidzartrds.cfdeoujljpwn.us-east-1.rds.amazonaws.com";
+	$config['db']['db']                      = "Register";
 	$config['db']['un']                      = "register";
 	$config['db']['pw']                      = "jyAZC24jYEZfDjsE";
 	

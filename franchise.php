@@ -165,3 +165,8 @@ if (!$user) {
 
   </body>
 </html>
+<?php
+
+logHit();
+
+?>

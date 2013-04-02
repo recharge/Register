@@ -392,7 +392,6 @@ if ($action == "doUpdateFranchiseProfile") {
 		$insert[] = $user['id'];
 		
 		$ps = $pdo->prepare("UPDATE franchises SET name = ?, contact = ?, email = ?, phone = ?, rechargeApiKey = ?, siblingdiscount = ?, `welcome` = ?, `registration` = ?, `change` = ?, `reminder` = ?, `allow_cash` = ?, `allow_prorate` = ? WHERE id = ?");
-		$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_WARNING);
 		$ps->execute($insert);
 
 		if ($_POST['password'] != "" && ($_POST['password'] == $_POST['confirm'])) {
@@ -481,14 +480,96 @@ if ($action == "doResetHomeFranchise") {
 }
 
 if ($action == "doRegisterChild") {
-	// add to cart
-	$id = uniqid();
-	$_SESSION['cart'][$id]['class'] = $_POST['id'];
-	$_SESSION['cart'][$id]['child'] = $_POST['child'];
-	$_SESSION['cart'][$id]['pricing'] = $_POST['pricing'];
-	$_SESSION['cart'][$id]['custom'] = $_POST['custom'];
+
+	$error = false;
+
+	if ($_POST['doNewAccount']) {
+		// new user, create an account for them now
+		
+		// check email
+		$ps = $pdo->prepare("SELECT id FROM users WHERE email = ?");
+		$ps->execute(array($_POST['email']));
+		$user = $ps->fetchColumn();
+
+
+		if ($user) {
+			$badFields["email"] = "That email is already in use.";
+		}
+		if ($_POST['email'] == "") {
+		    $badFields["email"] = "Please enter an email.";
+		}
+		if ($_POST['password'] == "") {
+		    $badFields["password"] = "Please enter a password.";
+		}
+		if ($_POST['password_confirm'] != $_POST['password']) {
+		    $badFields["password_confirm"] = "Passwords do not match.";
+		}
+		
+		if (count($badFields) == 0) {
+			// get franchise ID from class ID
+			/// set it as home franchise so they don't have to set it again later
+			$ps = $pdo->prepare("SELECT franchise FROM classes WHERE id = ?");
+			$ps->execute(array($_POST['id']));
+			$franchise = $ps->fetchColumn();
+
+
+			// insert new user into DB
+			$insert = array();
+			$insert[] = $uid = uniqid();
+			$insert[] = $_POST['email'];
+			$insert[] = $_POST['email'];
+			$insert[] = crypt($_POST['password'], '$2a$10$stIapougoewluzOuylAQo$');
+			$insert[] = $franchise;
+			
+			$ps = $pdo->prepare("INSERT INTO users (id, name, email, `password`, home_franchise) VALUES (?, ?, ?, ?, ?)");
+			$ps->execute($insert);
+			
+			$_SESSION['UID'] = $uid;
+			$ps = $pdo->prepare("SELECT * FROM users WHERE id = ? AND active = 1");
+			$ps->execute(array($uid));
+			$user = $ps->fetch(PDO::FETCH_ASSOC); 
+		} else {
+			$error = true;
+		}
+	}
+
+	if ($_POST['doNewChild']) {
+		if ($_POST['student'] == "") {
+		    $badFields["student"] = "Please enter a name.";
+		}
+		if ($_POST['birthdate'] == "") {
+		    $badFields["birthdate"] = "Please enter a birthdate.";
+		}
+		if (strtotime(str_replace("-", "/", $_POST['birthdate'])) == 0) {
+		    $badFields["birthdate"] = "Please enter a birthdate like ".date('m/d/Y');
+		}
+
+		if (count($badFields) == 0) {
+			$insert = array();
+			$insert[] = $_POST['child'] = uniqid();
+			$insert[] = $user['id'];
+			$insert[] = $_POST['student'];
+			$insert[] = $_POST['grade'];
+			$insert[] = strtotime(str_replace("-", "/", $_POST['birthdate']));
+			
+			$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_WARNING);
+			$ps = $pdo->prepare("INSERT INTO children (id, parent, name, grade, birthdate) VALUES (?,?,?,?,?)");
+			$ps->execute($insert);
+		} else {
+			$error = true;
+		}
+	}
+
+	if (!$error) {
+		// add to cart
+		$id = uniqid();
+		$_SESSION['cart'][$id]['class'] = $_POST['id'];
+		$_SESSION['cart'][$id]['child'] = $_POST['child'];
+		$_SESSION['cart'][$id]['pricing'] = $_POST['pricing'];
+		$_SESSION['cart'][$id]['custom'] = $_POST['custom'];
 	
-	redirect("cart");
+		redirect("cart");
+	}
 
 }
 
@@ -612,6 +693,7 @@ if ($action == "doCheckout") {
 			}
 			
 			$error = false;
+
 			
 			if ($_POST['paymethod'] == "") {
 				// add pay method
@@ -621,6 +703,9 @@ if ($action == "doCheckout") {
 				$data['expDate'] = $_POST['expm'].$_POST['expy'];
 				$data['cvv2'] = $_POST['cvv2'];
 				$data['zip'] = $_POST['billingZIP'];
+				
+				//mail('ericcardin@gmail.com', 'actions.php 625', print_r($data, true));
+				
 				$paymethod = rechargeAddPayMethod($key, $data);
 				if ($paymethod->result->resultCode != 000) {
 					$error = true;
@@ -1369,8 +1454,9 @@ if ($action == "doUpdateFranchiseTemplate") {
 if ($action == "doDeleteFranchiseEmail") {
 		$insert = array();
 		$insert[] = $_GET['id'];
+		$insert[] = $uid;
 		
-		$ps = $pdo->prepare("DELETE FROM templates  WHERE id = ?");
+		$ps = $pdo->prepare("DELETE FROM templates WHERE id = ? AND owner = ?");
 		$ps->execute($insert);
 
 		setError(2, "Email template deleted successfully.");

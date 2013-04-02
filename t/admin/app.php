@@ -55,6 +55,12 @@
 				<div id="sixmonthChart"></div>
 			</div>
 		</div>
+		<div class="row-fluid">
+			<div class="span12">
+				<h5>Top 10 Franchisees Last 31 Days</h5>
+				<div id="revByFranchisee31Days"></div>
+			</div>
+		</div>
 	</div>
 </div>
 

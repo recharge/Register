@@ -37,7 +37,7 @@
 				</tr>
 				<?php if ($_SESSION['cartMonthly'] > 0) { ?>
 				<tr>
-					<td class="left"><strong>Total Monthly After</strong></td>
+					<td class="left"><strong>Total Monthly</strong></td>
 					<td><strong >$<?php echo number_format($_SESSION['cartMonthly'], 2) ?></strong></td>
 				</tr>
 				<?php } ?>
@@ -91,6 +91,12 @@
 				                <input type="text" id="input_<?php echo $fieldName ?>" name="<?php echo $fieldName ?>" value="<?php echo $_POST[$fieldName] ?>"/>
 				                <?php if (isset($badFields[$fieldName])) { ?>
 				                <span class="help-inline"><?php echo $badFields[$fieldName] ?></span>
+				                <?php } else { ?>
+				                <span class="help-inline">
+				                	<img src="https://www.rechargebilling.com/images/cc_visa.png">
+				                	<img src="https://www.rechargebilling.com/images/cc_mc.png">
+				                	<img src="https://www.rechargebilling.com/images/cc_discover.png">
+				                </span>
 				                <?php } ?>
 				              </div>
 				            </div>
@@ -280,13 +286,16 @@
 		              	$pricing = calculateMonthlyPayments($class['startdate'], $class['enddate'], $class['payments_price']);
 		              	$price = $pricing['amount'];
 		              	$permo = " / month";
+
+		              	$monthly += round($price, 2);
+				        $monthlytotal += $class['payments_price'];
 		              } else {
 			          	$price = $class['price'];
 			          	$permo = "";
 		              }
 
 		              // proration
-		              if (mktime() > $class['startdate'] && 1==1) {
+		              if (mktime() > $class['startdate'] && $franchise['allow_prorate'] == 1) {
 		              	// set flag
 		              	$prorated = true;
 
@@ -301,12 +310,12 @@
 	              	    // change price
 	              	    if ($item['pricing'] == 1) {
 	              	    	// recurring
-	              	    	$class['payments_price'] = round($class['payments_price'] * ($daysLeft / $classLength), 2);
-	              	    	$pricing = calculateMonthlyPayments(mktime(), $class['enddate'], $class['payments_price']);
-	              	    	$price = $pricing['amount'] + 0.01;
+	              	    	//$class['payments_price'] = round($class['payments_price'] * ($daysLeft / $classLength), 2);
+	              	    	//$pricing = calculateMonthlyPayments(mktime(), $class['enddate'], $class['payments_price']);
+	              	    	//$price = $pricing['amount'] + 0.01;
 
-				            $monthly += round($price, 2);
-				            $monthlytotal += $class['payments_price'];
+				            //$monthly += round($price, 2);
+				            //$monthlytotal += $class['payments_price'];
 	              	    } else {
 	              	    	// one-time
 	              	    	$price = round($price * ($daysLeft / $classLength), 2);
@@ -325,7 +334,7 @@
                 <tr>
                   <td>
                   	<?php if ($class['img'] == "") { ?>
-						<img src="http://s3.amazonaws.com/register_core/firm/registration_branding_decorators/logos/4fb9/60f4/ea2f/d900/0700/0003/medium/ka_logo.png?1337549105" class="img-polaroid" style="height: 75px;">
+						<img src="https://www.filepicker.io/api/file/EwFIXBqYRyOq_P3Pcak2" class="img-polaroid" style="height: 75px;">
 					<?php } else { ?>
 						<img src="/img/uploads/<?php echo $class['img'] ?>" class="img-polaroid" style="height: 75px;">
 					<?php } ?>
@@ -432,7 +441,7 @@
 					<td><strong>$<?php echo number_format($total, 2) ?></strong></td>
 					<?php $_SESSION['cartTotal'] = $total; ?>
 				</tr>
-				<?php if ($monthly > 0) { ?>
+				<?php if (round(($monthlytotal / $monthly) - 1, 0) > 0) { ?>
 				<tr>
 					<td><strong>Plus <?php echo round(($monthlytotal / $monthly) - 1, 0) ?> additional payments of</strong></td>
 					<td><strong>$<?php echo number_format($monthly, 2) ?></strong></td>

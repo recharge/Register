@@ -126,7 +126,11 @@ function rechargeCall($api_key, $resource, $method, $data=null) {
 	curl_setopt($ch, CURLOPT_USERPWD,"$api_key:");
 	
 	// tell curl to pass the result when complete
-	curl_setopt($ch,CURLOPT_RETURNTRANSFER, true); 
+	curl_setopt($ch,CURLOPT_RETURNTRANSFER, true);
+
+
+	//curl_setopt($ch, CURLOPT_VERBOSE, 1);
+	//curl_setopt($ch, CURLOPT_HEADER, 1); 
 	
 	// execute and store response into variable
 	$result = curl_exec($ch);
@@ -134,10 +138,15 @@ function rechargeCall($api_key, $resource, $method, $data=null) {
 	// close connection
 	curl_close($ch);
 		
-	
+	//mail('ericcardin@gmail.com', 'functions 137', $resource . ' ' . print_r($data, true) . ' ' . $result);
+
 	// Puts the XML result into the SimpleXML format for easy data retrieval
 	// Read about SimpleXML here: http://php.net/manual/en/simplexml.examples-basic.php
-	return new SimpleXMLElement($result);
+	try {
+		return new SimpleXMLElement($result);
+	} catch (Exception $e) {
+		setError(1, "Error");
+	}
 
 }
 
@@ -159,7 +168,7 @@ function rechargeAddCustomer($key, $data) {
 
 function rechargeAddPayMethod($key, $data) {
 	$result = rechargeCall($key, "paymethods", "POST", $data);
-	
+
 	return $result;
 }
 
@@ -440,5 +449,21 @@ function sendClassReminderEmail($class) {
 			mail($parent['email'], $template['subject'], $template['body'], $headers);
 		}
 	}
+}
+
+function logHit() {
+	global $pdo;
+	global $uid;
+	$insert = array();
+	$insert[] = uniqid();
+	$insert[] = mktime();
+	$insert[] = $_SERVER["REQUEST_URI"];
+	$insert[] = $_SERVER["HTTP_REFERER"];
+	$insert[] = $uid;
+	$insert[] = $_SERVER["HTTP_X_FORWARDED_FOR"];
+	
+	$ps = $pdo->prepare("INSERT INTO hits (id, timestamp, page, referer, user, ip) VALUES (?, ?, ?, ?, ?, ?)");
+	$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_WARNING);
+	$ps->execute($insert);
 }
 ?>

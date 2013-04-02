@@ -32,7 +32,12 @@ if ($user && ($user['emergency_contact_name'] == "" || $user['emergency_contact_
 <html lang="en">
   <head>
     <meta charset="utf-8">
+    <?php if ($franchise['branding'] == 2) { ?>
+    <title>Art Innovators | Register</title>
+    <?php } else { ?>
     <title>KidzArt | Register</title>
+    <?php } ?>
+    
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="">
     <meta name="author" content="">
@@ -97,7 +102,13 @@ if ($user && ($user['emergency_contact_name'] == "" || $user['emergency_contact_
       <?php 
       
       	if ($uid == "") {
-      		include('t/user/frontpage.php'); 
+          if ($_GET['page'] == "class") {
+            include('t/user/class.php'); 
+          } else if ($_GET['page'] == "cart") {
+            include('t/user/cart.php'); 
+          } else {
+            include('t/user/frontpage.php'); 
+          }
       	} else {
       		if ($_GET['error'] == 404) {
 	      		// remove the directory path we don't want 
@@ -154,3 +165,8 @@ if ($user && ($user['emergency_contact_name'] == "" || $user['emergency_contact_
 
   </body>
 </html>
+<?php
+
+logHit();
+
+?>

@@ -22,7 +22,7 @@ $class = $ps->fetch(PDO::FETCH_ASSOC);
 <html lang="en">
   <head>
     <meta charset="utf-8">
-    <title>KidzArt Printable Class Sheet | <?php echo $class['name'] ?></title>
+    <title>KidzArt Printable Class Roster | <?php echo $class['name'] ?></title>
 
     <!-- Le styles -->
     <link href="/css/bootstrap.css" rel="stylesheet">

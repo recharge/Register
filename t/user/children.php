@@ -39,6 +39,13 @@ $child = $ps->fetch(PDO::FETCH_ASSOC);
 	              		<option <?php echo ($child['grade'] == "4th Grade" ? "selected" : "") ?>>4th Grade</option>
 	              		<option <?php echo ($child['grade'] == "5th Grade" ? "selected" : "") ?>>5th Grade</option>
 	              		<option <?php echo ($child['grade'] == "6th Grade" ? "selected" : "") ?>>6th Grade</option>
+	              		<option <?php echo ($child['grade'] == "7th Grade" ? "selected" : "") ?>>7th Grade</option>
+	              		<option <?php echo ($child['grade'] == "8th Grade" ? "selected" : "") ?>>8th Grade</option>
+	              		<option <?php echo ($child['grade'] == "9th Grade" ? "selected" : "") ?>>9th Grade</option>
+	              		<option <?php echo ($child['grade'] == "10th Grade" ? "selected" : "") ?>>10th Grade</option>
+	              		<option <?php echo ($child['grade'] == "11th Grade" ? "selected" : "") ?>>11th Grade</option>
+	              		<option <?php echo ($child['grade'] == "12th Grade" ? "selected" : "") ?>>12th Grade</option>
+	              		<option <?php echo ($child['grade'] == "Adult" ? "selected" : "") ?>>Adult</option>
 	              	</select>
 	                <?php if (isset($badFields[$fieldName])) { ?>
 	                <span class="help-inline"><?php echo $badFields[$fieldName] ?></span>
@@ -109,6 +116,13 @@ $child = $ps->fetch(PDO::FETCH_ASSOC);
 	              		<option>4th Grade</option>
 	              		<option>5th Grade</option>
 	              		<option>6th Grade</option>
+	              		<option>7th Grade</option>
+	              		<option>8th Grade</option>
+	              		<option>9th Grade</option>
+	              		<option>10th Grade</option>
+	              		<option>11th Grade</option>
+	              		<option>12th Grade</option>
+	              		<option>Adult</option>
 	              	</select>
 	                <?php if (isset($badFields[$fieldName])) { ?>
 	                <span class="help-inline"><?php echo $badFields[$fieldName] ?></span>

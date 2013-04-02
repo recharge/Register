@@ -97,6 +97,8 @@ include 'bin/actions.php';
 				include('t/admin/curriccenter.php');
 			} else if ($resource == "email") {
         include('t/admin/email.php');
+      } else if ($resource == "hits") {
+        include('t/admin/hits.php');
       } else {
 				include('t/admin/app.php'); 
 			}
@@ -106,7 +108,7 @@ include 'bin/actions.php';
       <hr>
 
       <footer>
-        <p>&copy; 2013 KidzzArt</p>
+        <p>&copy; 2013 KidzArt</p>
       </footer>
 
     </div> <!-- /container -->

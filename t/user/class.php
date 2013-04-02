@@ -12,7 +12,7 @@ $franchise = $ps->fetch(PDO::FETCH_ASSOC);
 	<div class="span3">
 		<div style="">
 			<?php if ($class['img'] == "") { ?>
-				<img src="http://s3.amazonaws.com/register_core/firm/registration_branding_decorators/logos/4fb9/60f4/ea2f/d900/0700/0003/medium/ka_logo.png?1337549105" class="img-polaroid">
+				<img src="https://www.filepicker.io/api/file/EwFIXBqYRyOq_P3Pcak2" class="img-polaroid">
 			<?php } else { ?>
 				<img src="/img/uploads/<?php echo $class['img'] ?>" class="img-polaroid">
 			<?php } ?>
@@ -29,7 +29,7 @@ $franchise = $ps->fetch(PDO::FETCH_ASSOC);
 	    <dd><?php echo $class['name'] ?></dd>
 	    
 	    <dt>Description</dt>
-	    <dd><?php echo $class['description'] ?>&nbsp;</dd>
+	    <dd><?php echo nl2br($class['description']) ?>&nbsp;</dd>
     
     	<dt>Dates</dt>
 	    <dd><strong><?php echo date("l F jS Y", $class['startdate']) ?></strong> <small>through</small> <strong><?php echo date("l F jS Y", $class['enddate']) ?></strong></dd>
@@ -67,7 +67,7 @@ $franchise = $ps->fetch(PDO::FETCH_ASSOC);
 	    	<?php if ($class['payments_price'] > 0) { ?>
 		    	<?php $pricing = calculateMonthlyPayments($class['startdate'], $class['enddate'], $class['payments_price']); ?>
 		    	<?php if ($pricing['months'] > 1) { ?>
-		    	 	or <strong><?php echo $pricing['months'] ?> monthly <?php echo $pricing['plural'] ?> of $<?php echo $pricing['amount'] ?></strong>
+		    	 	or <strong><?php echo $pricing['months'] ?> monthly <?php echo $pricing['plural'] ?> of $<?php echo number_format($pricing['amount'], 2) ?></strong>
 		    	 <?php } ?>
 	    	<?php } ?>
 	    </dd> 
@@ -75,31 +75,136 @@ $franchise = $ps->fetch(PDO::FETCH_ASSOC);
 	</dl>
 	
 	<legend>Register for this class</legend>
-	
+
 	<form class="bs-docs-example form-horizontal" action="" method="post" id="registerForm">
 	<input type="hidden" name="action" value="doRegisterChild">
 	<input type="hidden" name="id" value="<?php echo $class['id'] ?>">
+
+	<?php if ($uid == "") { ?>
+
+		<input type="hidden" name="doNewAccount" value="true">
+
+		<div class="alert alert-info">
+		  <strong>Not registered yet!</strong> That's OK, you can create a profile here:
+		</div>
+
+	    <?php $fieldName = "email"; ?>
+        <div class="control-group <?php echo (isset($badFields[$fieldName]) ? 'warning' : ''); ?>">
+          <label for="inputEmail" class="control-label">Email Address</label>
+          <div class="controls">
+            <input type="text" id="input_<?php echo $fieldName ?>" name="<?php echo $fieldName ?>" value="<?php echo $_POST[$fieldName] ?>"/>
+            <?php if (isset($badFields[$fieldName])) { ?>
+            <span class="help-inline"><?php echo $badFields[$fieldName] ?></span>
+            <?php } ?>
+          </div>
+        </div>
+
+        <?php $fieldName = "password"; ?>
+        <div class="control-group <?php echo (isset($badFields[$fieldName]) ? 'warning' : ''); ?>">
+          <label for="inputEmail" class="control-label">Password</label>
+          <div class="controls">
+            <input type="password" id="input_<?php echo $fieldName ?>" name="<?php echo $fieldName ?>" value="<?php echo $_POST[$fieldName] ?>"/>
+            <?php if (isset($badFields[$fieldName])) { ?>
+            <span class="help-inline"><?php echo $badFields[$fieldName] ?></span>
+            <?php } ?>
+          </div>
+        </div>
+
+        <?php $fieldName = "password_confirm"; ?>
+        <div class="control-group <?php echo (isset($badFields[$fieldName]) ? 'warning' : ''); ?>">
+          <label for="inputEmail" class="control-label">Confirm Password</label>
+          <div class="controls">
+            <input type="password" id="input_<?php echo $fieldName ?>" name="<?php echo $fieldName ?>" value="<?php echo $_POST[$fieldName] ?>"/>
+            <?php if (isset($badFields[$fieldName])) { ?>
+            <span class="help-inline"><?php echo $badFields[$fieldName] ?></span>
+            <?php } ?>
+          </div>
+        </div>
+
+        <hr>
+
+	<?php } else { ?>
+		
+		<?php
+		$ps = $pdo->prepare("SELECT * FROM children WHERE parent = ? AND id NOT IN (SELECT child FROM students WHERE class = ?) ORDER BY birthdate");
+		$ps->execute(array($user['id'], $class['id']));
+		$children = $ps->fetchAll();
+		?>
+		
+		<?php if ($children) { ?>
+			<div class="control-group">
+		      <label for="inputEmail" class="control-label">Student Name</label>
+		      <div class="controls">
+		        <select name="child">
+		        <?php foreach ($children as $child) { ?>
+		        	<option value="<?php echo $child['id'] ?>"><?php echo $child['name'] ?></option>
+		        <?php } ?>
+		        </select>
+		      </div>
+		    </div>
+		<?php } ?>	
 	
-	<?php
-	$ps = $pdo->prepare("SELECT * FROM children WHERE parent = ? AND id NOT IN (SELECT child FROM students WHERE class = ?) ORDER BY birthdate");
-	$ps->execute(array($user['id'], $class['id']));
-	$children = $ps->fetchAll();
-	?>
-	
-	<div class="control-group <?php if (!$children) { echo "error"; } ?>">
-      <label for="inputEmail" class="control-label">Student Name</label>
-      <div class="controls">
-        <select name="child">
-        <?php foreach ($children as $child) { ?>
-        	<option value="<?php echo $child['id'] ?>"><?php echo $child['name'] ?></option>
-        <?php } ?>
-        </select>
-        <?php if (!$children) { ?>
-        	<span class="help-block"><strong>All your children have been registered for this class.<br><a href="/children/new">Click here to add a child.</a></strong></span>
-        <?php } ?>
-      </div>
-    </div>
-    
+	<?php } ?>
+
+	<?php if (!$children) { ?>
+
+		<input type="hidden" name="doNewChild" value="true">
+
+		<?php $fieldName = "student"; ?>
+        <div class="control-group <?php echo (isset($badFields[$fieldName]) ? 'warning' : ''); ?>">
+          <label for="inputEmail" class="control-label">Student Name</label>
+          <div class="controls">
+            <input type="text" id="input_<?php echo $fieldName ?>" name="<?php echo $fieldName ?>" value="<?php echo $_POST[$fieldName] ?>"/>
+            <?php if (isset($badFields[$fieldName])) { ?>
+            <span class="help-inline"><?php echo $badFields[$fieldName] ?></span>
+            <?php } ?>
+          </div>
+        </div>
+
+	    <?php $fieldName = "grade"; ?>
+	    <div class="control-group <?php echo (isset($badFields[$fieldName]) ? 'warning' : ''); ?>">
+	              <label for="inputEmail" class="control-label">Grade</label>
+	              <div class="controls">
+					<select name="<?php echo $fieldName ?>">
+	              		<option value="">Choose...</option>
+	              		<option>Under 4</option>
+	              		<option>Pre-Kindergarten</option>
+	              		<option>Kindergarten</option>
+	              		<option>1st Grade</option>
+	              		<option>2nd Grade</option>
+	              		<option>3rd Grade</option>
+	              		<option>4th Grade</option>
+	              		<option>5th Grade</option>
+	              		<option>6th Grade</option>
+	              		<option>7th Grade</option>
+	              		<option>8th Grade</option>
+	              		<option>9th Grade</option>
+	              		<option>10th Grade</option>
+	              		<option>11th Grade</option>
+	              		<option>12th Grade</option>
+	              		<option>Adult</option>
+	              	</select>
+	                <?php if (isset($badFields[$fieldName])) { ?>
+	                <span class="help-inline"><?php echo $badFields[$fieldName] ?></span>
+	                <?php } ?>
+	              </div>
+	            </div>
+
+	    <?php $fieldName = "birthdate"; ?>
+        <div class="control-group <?php echo (isset($badFields[$fieldName]) ? 'warning' : ''); ?>">
+          <label for="inputEmail" class="control-label">Birthdate</label>
+          <div class="controls">
+            <input type="text" id="input_<?php echo $fieldName ?>" name="<?php echo $fieldName ?>" value="<?php echo $_POST[$fieldName] ?>"/>
+            <?php if (isset($badFields[$fieldName])) { ?>
+            <span class="help-inline"><?php echo $badFields[$fieldName] ?></span>
+            <?php } ?>
+          </div>
+        </div>
+
+	    <hr>
+	<?php } ?>
+
+	    
     <script>
     	$(document).ready(function() {
 		    $("#pricing").change(function() {
@@ -114,8 +219,6 @@ $franchise = $ps->fetch(PDO::FETCH_ASSOC);
 		    });
 		});
     </script>
-    
-    <?php if ($children) { ?>
     
     <div class="control-group">
       <label for="inputEmail" class="control-label">Price Option</label>
@@ -176,7 +279,7 @@ $franchise = $ps->fetch(PDO::FETCH_ASSOC);
       <label for="inputEmail" class="control-label"><strong>Terms and Conditions</strong></label>
       <div class="controls">
       	<label class="checkbox inline">
-        <input type="checkbox" id="tc" value="1"> I have read and agreed to the <a href="#toc" data-toggle="modal">KidzArt Terms and Conditions</a>.
+        <input type="checkbox" id="tc" value="1"> I have read and agreed to the <a href="#toc" data-toggle="modal">Terms and Conditions</a>.
       	</label>
       </div>
     </div>
@@ -190,10 +293,7 @@ $franchise = $ps->fetch(PDO::FETCH_ASSOC);
 	    <?php } ?>
 	</div>
 	
-	<?php } ?>
-    
 	</form>
-	
 
 	</div>
 	
