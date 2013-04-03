@@ -109,13 +109,13 @@ if (!$user) {
 	  <?php } ?>
       
       <?php 
-      	if ($uid == "") {
-      		if ($resource == "signup") {
-				include('t/franchise/signup.php');
-			} else {
-				include('t/franchise/frontpage.php');
-			}
-      	} else {
+      if ($uid == "") {
+      	if ($resource == "signup") {
+				  include('t/franchise/signup.php');
+  		  } else {
+  				include('t/franchise/frontpage.php');
+  			}
+      } else {
       		if ($resource == "signup") {
     				include('t/franchise/signup.php');
     			} else if ($resource == "class") {
@@ -144,6 +144,8 @@ if (!$user) {
   					include('t/franchise/email.php');
   				} else if ($resource == "users") {
             include('t/franchise/users.php');
+          } else if ($resource == "royalty") {
+            include('t/franchise/royalty.php');
           } else {
       				include('t/franchise/app.php'); 
     			}

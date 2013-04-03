@@ -159,6 +159,12 @@ if ($action == "doRegister") {
 		redirect("");
 	}
 	
+	if (strlen($_POST['ka_password']) < 7) {
+		setError(1, "The password must be at least 8 characters long.");
+		redirect("");
+	}
+	
+	
 	$insert = array();
 	$insert[] = $uid = uniqid();
 	$insert[] = $_POST['ka_name'];
@@ -340,6 +346,10 @@ if ($action == "doUpdateProfile") {
 	    $badFields["password"] = "Passwords do not match.";
 	    $badFields["confirm"] = "";
 	}
+	
+	if (strlen($_POST['password']) < 7) {
+			$badFields["password"] = "The password must be at least 8 characters long.";
+	}
 
 	if (count($badFields) == 0) {
 		$insert = array();
@@ -373,7 +383,11 @@ if ($action == "doUpdateFranchiseProfile") {
 	    $badFields["password"] = "Passwords do not match.";
 	    $badFields["confirm"] = "";
 	}
-
+	
+if (strlen($_POST['password']) < 7) {
+			$badFields["password"] = "The password must be at least 8 characters long.";
+	}
+	
 	if (count($badFields) == 0) {
 
 		$insert = array();
@@ -1353,6 +1367,25 @@ if ($action == "doDeleteCurricCenterFile") {
 	redirect("admin/curriccenter");
 }
 
+if ($action == "doEditKaWebinarsFile") {
+	$ps = $pdo->prepare("UPDATE kawebinars_files SET name = ?, tags = ? WHERE id = ?");
+	$ps->execute(array($_POST['name'], $_POST['tags'], $_POST['id']));
+
+	if ($_POST['thumbnail'] != "") {
+		$ps = $pdo->prepare("UPDATE kawebinars_files SET thumbnail = ? WHERE id = ?");
+		$ps->execute(array($_POST['thumbnail'], $_POST['id']));
+	}
+	
+	redirect("admin/kawebinars");
+}
+
+if ($action == "doDeleteKaWebinarsFile") {
+	$ps = $pdo->prepare("DELETE FROM kawebinars_files WHERE id = ?");
+	$ps->execute(array($_GET['id']));
+	
+	redirect("admin/kawebinars");
+}
+
 if ($action == "doAddAdminTemplate") {
 	if (isAdmin()) {
 		$insert = array();
@@ -1655,5 +1688,71 @@ if ($action == "doDeleteReport") {
 	$ps->execute($insert);
 	
 	redirect("franchise/students");
+}
+
+if ($action == "doNewRoyaltyReport") {
+
+	$badFields = array();
+
+	if (count($badFields) == 0) {
+		$insert = array();
+		$insert[] = $report = uniqid();
+		$insert[] = $user['id'];
+		$insert[] = $_POST['month'];
+		$insert[] = $_POST['year'];
+		
+		$ps = $pdo->prepare("INSERT INTO royalty (id, franchise, month, year) VALUES (?,?,?,?)");
+		$ps->execute($insert);
+
+		foreach ($_POST['revenue'] as $key => $value) {
+			$insert = array();
+			$insert[] = uniqid();
+			$insert[] = $report;
+			$insert[] = $key;
+			$insert[] = $_POST['revenue'][$key];
+			$insert[] = $_POST['students'][$key];
+			$insert[] = $_POST['hourlyrateperstudent'][$key];
+			$insert[] = $_POST['classes'][$key];
+			$insert[] = $_POST['classhours'][$key];
+			$insert[] = $_POST['advertisingcosts'][$key];
+			
+			$ps = $pdo->prepare("INSERT INTO royalty_revenue (id, report, `key`, revenue, `students`, `hourlyrateperstudent`, `classes`, `classhours`, `advertisingcosts`) VALUES (?,?,?,?,?,?,?,?,?)");
+			$ps->execute($insert);
+		}
+
+		foreach ($_POST['expenseamount'] as $key => $value) {
+			$insert = array();
+			$insert[] = uniqid();
+			$insert[] = $report;
+			$insert[] = $key;
+			$insert[] = $_POST['expenseamount'][$key];
+			
+			$ps = $pdo->prepare("INSERT INTO royalty_expenses (id, report, `key`, value) VALUES (?,?,?,?)");
+			$ps->execute($insert);
+		}
+		
+		redirect("franchise/royalty/");
+	}
+}
+
+if ($action == "doDeleteRoyaltyReport") {
+
+	$badFields = array();
+
+	if (count($badFields) == 0) {
+		$insert = array();
+		$insert[] = $_GET['id'];
+		
+		$ps = $pdo->prepare("DELETE FROM royalty WHERE id = ?");
+		$ps->execute($insert);
+
+		$ps = $pdo->prepare("DELETE FROM royalty_revenue WHERE report = ?");
+		$ps->execute($insert);
+
+		$ps = $pdo->prepare("DELETE FROM royalty_expenses WHERE report = ?");
+		$ps->execute($insert);
+		
+		redirect("franchise/royalty/");
+	}
 }
 ?>
