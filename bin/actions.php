@@ -384,12 +384,9 @@ if ($action == "doUpdateFranchiseProfile") {
 	    $badFields["confirm"] = "";
 	}
 	
-/* (Commented out, needs fixed to allow blank fields when not updating password and editing other information. )
-
-if (strlen($_POST['password']) < 7) {
-			$badFields["password"] = "The password must be at least 8 characters long.";
-
-	 */
+	if ($_POST['password'] != '' && strlen($_POST['password']) < 7) {
+		$badFields["password"] = "The password must be at least 8 characters long.";
+	}
 	
 	if (count($badFields) == 0) {
 
