@@ -1,5 +1,5 @@
 <?php
-function setError($type, $message) { 
+function setError($type, $message) {
 	switch ($type) {
 		case 1:
 			$type = "alert-error";
