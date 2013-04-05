@@ -1,1 +1,0 @@
-Cufon.replace('.brand, .hero-unit h1');

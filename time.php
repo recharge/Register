@@ -1,1 +1,0 @@
-<?php echo date("m/d/Y g:i:s a") ?>
