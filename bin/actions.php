@@ -384,9 +384,12 @@ if ($action == "doUpdateFranchiseProfile") {
 	    $badFields["confirm"] = "";
 	}
 	
+/* (Commented out, needs fixed to allow blank fields when not updating password and editing other information. )
+
 if (strlen($_POST['password']) < 7) {
 			$badFields["password"] = "The password must be at least 8 characters long.";
-	}
+
+	 */
 	
 	if (count($badFields) == 0) {
 
@@ -1754,5 +1757,186 @@ if ($action == "doDeleteRoyaltyReport") {
 		
 		redirect("franchise/royalty/");
 	}
+}
+
+if ($action == "doFranchiseAddUser") {
+
+	$pdo = new PDO($config['db']['dsn'], $config['db']['un'], $config['db']['pw']);
+	$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_WARNING);
+	
+	// check email
+	$ps = $pdo->prepare("SELECT id FROM users WHERE email = ?");
+	$ps->execute(array($_POST['parent']['email']));
+	$email = $ps->fetchColumn();
+
+	if ($email) {
+		setError(1, "That email address is in use.");
+		redirect("franchise/users/");
+	}
+
+	// SET TEMP PASSWORD
+	$pw = substr(sha1(uniqid()), 0, 8);
+	
+	// insert user
+	$insert = array();
+	$insert[] = $newUserId = uniqid();
+	$insert[] = $_POST['parent']['name'];
+	$insert[] = $_POST['parent']['email'];
+	$insert[] = crypt($pw, '$2a$10$stIapougoewluzOuylAQo$');
+	$insert[] = $uid;
+	
+	$ps = $pdo->prepare("INSERT INTO users (id, name, email, `password`, home_franchise) VALUES (?,?,?,?,?)");
+	$ps->execute($insert);
+
+	// insert children
+	foreach ($_POST['name'] as $key => $value) {
+		if ($value != '') {
+			$insert = array();
+			$insert[] = uniqid();
+			$insert[] = $newUserId;
+			$insert[] = $value;
+			$insert[] = $_POST['grade'][$key];
+			$insert[] = strtotime(str_replace("-", "/", $_POST['birthdate'][$key]));
+			
+			$ps = $pdo->prepare("INSERT INTO children (id, parent, name, grade, birthdate) VALUES (?,?,?,?,?)");
+			$ps->execute($insert);
+		}
+	}
+
+	// send mail to new user with login info
+	$from = "{$user['name']} <{$user['email']}>";
+    $headers  = "From: $from\r\n";
+
+    $subject = "Your Login Info for " . $user['name'];
+    $body = "Hello {$_POST['parent']['name']},
+
+We've set up a new account for you on our online registration system!
+
+You may log in by going to this link:
+https://registration.kidzart.com
+
+Your username is: {$_POST['parent']['email']}
+Your password is: $pw
+
+Our secure online registration system makes it easy to browse, sign up, and pay for classes.
+
+Thank you,
+
+{$user['name']}
+";
+
+	mail($_POST['parent']['email'], $subject, $body, $headers);
+	
+	
+	setError(2, "User added successfully!");
+	redirect("franchise/users/$newUserId");
+}
+
+if ($action == "doFranchiseAddChild") {
+
+	if (count($badFields) == 0) {
+		$insert = array();
+		$insert[] = uniqid();
+		$insert[] = $_POST['parent'];
+		$insert[] = $_POST['name'];
+		$insert[] = $_POST['grade'];
+		$insert[] = strtotime(str_replace("-", "/", $_POST['birthdate']));
+		
+		$ps = $pdo->prepare("INSERT INTO children (id, parent, name, grade, birthdate) VALUES (?,?,?,?,?)");
+		$ps->execute($insert);
+		
+		redirect("franchise/users/{$_POST['parent']}");
+	}
+}
+
+if ($action == "doFranchiseDeleteChild") {
+
+	$ps = $pdo->prepare("DELETE FROM children WHERE id = ?");
+	$ps->execute(array($_GET['id']));
+		
+	redirect("franchise/users/{$_GET['parent']}");
+}
+
+if ($action == "doFranchiseAddChild") {
+
+	if (count($badFields) == 0) {
+		$insert = array();
+		$insert[] = uniqid();
+		$insert[] = $_POST['parent'];
+		$insert[] = $_POST['name'];
+		$insert[] = $_POST['grade'];
+		$insert[] = strtotime(str_replace("-", "/", $_POST['birthdate']));
+		
+		$ps = $pdo->prepare("INSERT INTO children (id, parent, name, grade, birthdate) VALUES (?,?,?,?,?)");
+		$ps->execute($insert);
+		
+		redirect("franchise/users/{$_POST['parent']}");
+	}
+}
+
+if ($action == "doFranchiseRegisterChild") {
+
+	// get class info
+	$ps = $pdo->prepare("SELECT * FROM classes WHERE id = ?");
+	$ps->execute(array($_POST['class']));
+	$class = $ps->fetch(PDO::FETCH_ASSOC);
+
+	$insert = array();
+	$insert[] = $student = uniqid();
+	$insert[] = $_POST['parent'];
+	$insert[] = $_POST['child'];
+	$insert[] = $class['id'];
+	$insert[] = 0;
+	$insert[] = $class['price'];
+	$insert[] = mktime();
+	
+	$ps = $pdo->prepare("INSERT INTO students (id, parent, child, class, pricing, amount, registerdate) VALUES (?,?,?,?,?,?,?)");
+	$ps->execute($insert);
+
+	// insert into transactions database
+	$insert = array();
+	$insert[] = uniqid();
+	$insert[] = $uid;
+	$insert[] = $_POST['parent'];
+	$insert[] = $_POST['child'];
+	$insert[] = $class['id'];
+	$insert[] = mktime();
+	$insert[] = $class['price'];
+	$ps = $pdo->prepare("INSERT INTO transactions (id, franchise, user, child, class, randate, debit) VALUES (?,?,?,?,?,?,?)");
+	$ps->execute($insert);
+
+	// custom fields
+	if (count($_POST['custom']) > 0) {
+
+		foreach ($_POST['custom'] as $key => $value) {
+			$insert = array();
+			$insert[] = uniqid();
+			$insert[] = $uid;
+			$insert[] = $student;
+			$insert[] = $key;
+			if (is_array($value)) {
+				$insert[] = implode(", ", $value);
+			} else {
+				$insert[] = $value;
+			}
+
+			if ($value != "") {
+				$ps = $pdo->prepare("INSERT INTO customfields_values (id, owner, student, `key`, `value`) VALUES (?,?,?,?,?)");
+				$ps->execute($insert);
+			}
+		}
+	}
+
+	sendRegistrationEmail($student);
+
+	redirect("franchise/users/{$_POST['parent']}");
+}
+
+if ($action == "doFranchiseDeleteRegistration") {
+
+	$ps = $pdo->prepare("DELETE FROM students WHERE id = ?");
+	$ps->execute(array($_GET['id']));
+		
+	redirect("franchise/users/{$_GET['parent']}");
 }
 ?>

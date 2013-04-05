@@ -45,7 +45,7 @@
                 <tr>
                   <td><strong>Total</strong></td>
                   <td colspan="1"></td>
-                  <td><strong>$<?php echo $total ?></strong></td>
+                  <td><strong>$<?php echo number_format($total, 2) ?></strong></td>
                   <td colspan="2"></td>
                 </tr>
                 <?php } ?>

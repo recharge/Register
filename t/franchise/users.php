@@ -1,5 +1,4 @@
 <div class="row">
-<div class="row">
 
 	<?php
 	$ps = $pdo->prepare("SELECT * FROM users WHERE id = ? AND home_franchise = ?");
@@ -39,14 +38,20 @@
 
         <div class="span6">
 
-        	<h4>Children</h4>
+        	<h4>
+        		Children
+        		<button class="btn btn-mini" data-toggle="modal" data-target="#addChildModal">
+        			<i class="icon icon-plus"></i>
+        		</button>
+			</h4>
 
-	        <table class="table table-striped">
+	        <table class="table table-bordered table-striped">
 				<thead>
 					<tr>
 						<th>Name</th>
 						<th>Grade</th>
 						<th>Birthdate</th>
+						<th>Delete</th>
 					</tr>
 				</thead>
 				<?php
@@ -60,7 +65,17 @@
 						<td><?php echo $child['name'] ?></td>
 						<td><?php echo $child['grade'] ?></td>
 						<td><?php echo date("F j, Y", $child['birthdate']) ?></td>
+						<td>
+							<a class="btn btn-mini" href="/franchise/users/<?php echo $record['id'] ?>?action=doFranchiseDeleteChild&id=<?php echo $child['id'] ?>&parent=<?php echo $record['id'] ?>">
+			        			<i class="icon icon-trash"></i>
+			        		</a>
+        				</td>	
 					</tr>
+					<?php } ?>
+					<?php if (!$children) { ?>
+						<tr>
+							<td colspan="4">No Children</td>
+						</tr>
 					<?php } ?>
 				</tbody>
 	        </table>
@@ -69,14 +84,20 @@
 
         <div class="span6">
 
-        	<h4>Registrations</h4>
+        	<h4>
+        		Registrations
+        		<button class="btn btn-mini" data-toggle="modal" data-target="#addRegistrationModal">
+        			<i class="icon icon-plus"></i>
+        		</button>
+			</h4>
 
-	        <table class="table table-striped">
+	        <table class="table table-bordered table-striped">
 				<thead>
 					<tr>
 						<th>Name</th>
 						<th>Class</th>
 						<th>Register Date</th>
+						<th>Delete</th>
 					</tr>
 				</thead>
 				<?php
@@ -101,7 +122,17 @@
 						<td><?php echo $child['name'] ?></td>
 						<td><?php echo $class['name'] ?></td>
 						<td><?php echo date("F j, Y", $student['registerdate']) ?></td>
+						<td>
+							<a class="btn btn-mini" href="/franchise/users/<?php echo $record['id'] ?>?action=doFranchiseDeleteRegistration&id=<?php echo $student['id'] ?>&parent=<?php echo $record['id'] ?>">
+			        			<i class="icon icon-trash"></i>
+			        		</a>
+        				</td>
 					</tr>
+					<?php } ?>
+					<?php if (!$students) { ?>
+						<tr>
+							<td colspan="4">No Registrations</td>
+						</tr>
 					<?php } ?>
 				</tbody>
 	        </table>
@@ -294,6 +325,174 @@
 		</form>
 	</div>
 
+	<div id="addChildModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+		<form class="form-horizontal" action="/franchise/users/new" style="margin: 0px;" method="post">
+			<input type="hidden" name="action" value="doFranchiseAddChild">
+			<input type="hidden" name="parent" value="<?php echo $record['id'] ?>">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+				<h3 id="myModalLabel">Add Child</h3>
+			</div>
+			<div class="modal-body">
+
+				            <?php $fieldName = "name"; ?>
+				            <div class="control-group <?php echo (isset($badFields[$fieldName]) ? 'warning' : ''); ?>">
+				              <label for="inputEmail" class="control-label">Name</label>
+				              <div class="controls">
+				                <input type="text" id="input_<?php echo $fieldName ?>" name="<?php echo $fieldName ?>" />
+				                <?php if (isset($badFields[$fieldName])) { ?>
+				                <span class="help-inline"><?php echo $badFields[$fieldName] ?></span>
+				                <?php } ?>
+				              </div>
+				            </div>
+				            
+				            <?php $fieldName = "grade"; ?>
+				            <div class="control-group <?php echo (isset($badFields[$fieldName]) ? 'warning' : ''); ?>">
+				              <label for="inputEmail" class="control-label">Grade</label>
+				              <div class="controls">
+								<select name="<?php echo $fieldName ?>">
+				              		<option value="">Choose...</option>
+				              		<option <?php echo ($child['grade'] == "Under 4" ? "selected" : "") ?>>Under 4</option>
+				              		<option <?php echo ($child['grade'] == "Pre-Kindergarten" ? "selected" : "") ?>>Pre-Kindergarten</option>
+				              		<option <?php echo ($child['grade'] == "Kindergarten" ? "selected" : "") ?>>Kindergarten</option>
+				              		<option <?php echo ($child['grade'] == "1st Grade" ? "selected" : "") ?>>1st Grade</option>
+				              		<option <?php echo ($child['grade'] == "2nd Grade" ? "selected" : "") ?>>2nd Grade</option>
+				              		<option <?php echo ($child['grade'] == "3rd Grade" ? "selected" : "") ?>>3rd Grade</option>
+				              		<option <?php echo ($child['grade'] == "4th Grade" ? "selected" : "") ?>>4th Grade</option>
+				              		<option <?php echo ($child['grade'] == "5th Grade" ? "selected" : "") ?>>5th Grade</option>
+				              		<option <?php echo ($child['grade'] == "6th Grade" ? "selected" : "") ?>>6th Grade</option>
+				              		<option <?php echo ($child['grade'] == "7th Grade" ? "selected" : "") ?>>7th Grade</option>
+				              		<option <?php echo ($child['grade'] == "8th Grade" ? "selected" : "") ?>>8th Grade</option>
+				              		<option <?php echo ($child['grade'] == "9th Grade" ? "selected" : "") ?>>9th Grade</option>
+				              		<option <?php echo ($child['grade'] == "10th Grade" ? "selected" : "") ?>>10th Grade</option>
+				              		<option <?php echo ($child['grade'] == "11th Grade" ? "selected" : "") ?>>11th Grade</option>
+				              		<option <?php echo ($child['grade'] == "12th Grade" ? "selected" : "") ?>>12th Grade</option>
+				              		<option <?php echo ($child['grade'] == "Adult" ? "selected" : "") ?>>Adult</option>
+				              	</select>
+				                <?php if (isset($badFields[$fieldName])) { ?>
+				                <span class="help-inline"><?php echo $badFields[$fieldName] ?></span>
+				                <?php } ?>
+				              </div>
+				            </div>
+				            
+				            <?php $fieldName = "birthdate"; ?>
+				            <div class="control-group <?php echo (isset($badFields[$fieldName]) ? 'warning' : ''); ?>">
+				              <label for="inputEmail" class="control-label">Birthdate</label>
+				              <div class="controls">
+				                <input type="text" id="input_<?php echo $fieldName ?>" name="<?php echo $fieldName ?>" />
+				                <?php if (isset($badFields[$fieldName])) { ?>
+				                <span class="help-inline"><?php echo $badFields[$fieldName] ?></span>
+				                <?php } ?>
+				              </div>
+				            </div>
+
+			</div>
+			<div class="modal-footer">
+				<a class="btn" data-dismiss="modal" aria-hidden="true">Close</a>
+				<button class="btn btn-primary">Add Child</button>
+			</div>
+		</form>
+	</div>
+
+	<div id="addRegistrationModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+		<form class="form-horizontal" action="/franchise/users/new" style="margin: 0px;" method="post">
+			<input type="hidden" name="action" value="doFranchiseRegisterChild">
+			<input type="hidden" name="parent" value="<?php echo $record['id'] ?>">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+				<h3 id="myModalLabel">New Registration</h3>
+			</div>
+			<div class="modal-body">
+
+				            <?php $fieldName = "child"; ?>
+				            <div class="control-group <?php echo (isset($badFields[$fieldName]) ? 'warning' : ''); ?>">
+				              <label for="inputEmail" class="control-label">Child</label>
+				              <div class="controls">
+								<select name="<?php echo $fieldName ?>">
+									<?php
+									$ps = $pdo->prepare("SELECT * FROM children WHERE parent = ?");
+									$ps->execute(array($record['id']));
+									$children = $ps->fetchAll();
+									?>
+				              		<option value="">Choose...</option>
+				              		<?php foreach ($children as $child) { ?>
+				              		<option value="<?php echo $child['id'] ?>"><?php echo $child['name'] ?></option>
+				              		<?php } ?>
+				              	</select>
+				                <?php if (isset($badFields[$fieldName])) { ?>
+				                <span class="help-inline"><?php echo $badFields[$fieldName] ?></span>
+				                <?php } ?>
+				              </div>
+				            </div>
+				            
+				            <?php $fieldName = "class"; ?>
+				            <div class="control-group <?php echo (isset($badFields[$fieldName]) ? 'warning' : ''); ?>">
+				              <label for="inputEmail" class="control-label">Class</label>
+				              <div class="controls">
+								<select name="<?php echo $fieldName ?>">
+									<?php
+									$ps = $pdo->prepare("SELECT * FROM classes WHERE franchise = ? AND enddate > ?");
+									$ps->execute(array($uid, mktime()));
+									$classes = $ps->fetchAll();
+									?>
+				              		<option value="">Choose...</option>
+				              		<?php foreach ($classes as $class) { ?>
+				              		<option value="<?php echo $class['id'] ?>"><?php echo $class['name'] ?> (<?php echo date("m/d/Y", $class['startdate']) ?> - <?php echo date("m/d/Y", $class['enddate']) ?>) -- $<?php echo number_format($class['price'], 2) ?></option>
+				              		<?php } ?>
+				              	</select>
+				                <?php if (isset($badFields[$fieldName])) { ?>
+				                <span class="help-inline"><?php echo $badFields[$fieldName] ?></span>
+				                <?php } ?>
+				              </div>
+				            </div>
+
+				                <?php
+				            	$ps = $pdo->prepare("SELECT * FROM customfields_keys WHERE franchise = ?");
+				            	$ps->execute(array($uid));
+				            	$customfields = $ps->fetchAll();
+				            	?>
+
+				            	<?php foreach ($customfields as $field) { ?>
+
+				            	<div class="control-group">
+				                  <label for="inputEmail" class="control-label"><?php echo $field['name'] ?></label>
+				                  <div class="controls">
+				                  	<?php if ($field['type'] == 0) { ?>
+				                    	<input type="text" name="custom[<?php echo $field['id'] ?>]">
+				                    <?php } ?>
+				                    <?php if ($field['type'] == 1) { ?>
+				                    	<select name="custom[<?php echo $field['id'] ?>]">
+				                    		<?php $options = explode(",", $field['values']); ?>
+				                    			<option value="">Choose...</option>
+				                    		<?php foreach ($options as $option) { ?>
+				                    			<option><?php echo $option ?></option>
+				                    		<?php } ?>
+				                    	</select>
+				                    <?php } ?>
+				                    <?php if ($field['type'] == 2) { ?>
+				                    	<?php $options = explode(",", $field['values']); ?>
+				                		<?php foreach ($options as $option) { ?>
+				                			<label class="checkbox inline">
+				            					<input type="checkbox" name="custom[<?php echo $field['id'] ?>][]" value="<?php echo $option ?>"> <?php echo $option ?>
+				            				</label>
+				                		<?php } ?>
+				                    <?php } ?>
+				                    <?php if ($field['helptext'] != "") { ?>
+				                    	<div class="help-block"><?php echo $field['helptext'] ?></div>
+				                    <?php } ?>
+				                  </div>
+				                </div>
+
+				                <?php } ?>
+
+			</div>
+			<div class="modal-footer">
+				<a class="btn" data-dismiss="modal" aria-hidden="true">Close</a>
+				<button class="btn btn-primary">Register</button>
+			</div>
+		</form>
+	</div>
+
 	<?php } else { ?>
 
 		<script type="text/javascript">
@@ -313,12 +512,16 @@
 		<h2>Users</h2>
 
 		<div class="pull-right" style="margin-top: -30px; margin-bottom: -20px;">
-		<form class="form-search" action="/franchise/users/" method="get">
-		    <div class="input-append">
-			    <input type="text" class="span2 search-query" name="q">
-			    <button type="submit" class="btn">Search</button>
-		    </div>
-		</form>
+			<form class="form-search" action="/franchise/users/" method="get">
+			<button type="button" class="btn btn-success" data-toggle="modal" data-target="#addUserModal">
+				<i class="icon icon-white icon-plus"></i> 
+				Add User
+			</button>
+				<div class="input-append">
+					<input type="text" class="span2 search-query" name="q">		
+					<button type="submit" class="btn">Search</button>
+				</div>
+			</form>
 		</div>
 		
 		<hr>
@@ -381,7 +584,135 @@
         <button type="submit" class="btn btn-primary"><i class="icon-envelope icon-white"></i> Send Email</button>
         </form>	
 	</div>
+
+	<div id="addUserModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+		<form class="form-horizontal" action="/franchise/users/new" style="margin: 0px;" method="post">
+			<input type="hidden" name="action" value="doFranchiseAddUser">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+				<h3 id="myModalLabel">Add User</h3>
+			</div>
+			<div class="modal-body">
+
+				<h4>Primary Parent</h4>
+
+				<div class="control-group">
+					<label class="control-label" for="inputEmail">Name</label>
+					<div class="controls">
+						<input type="text" name="parent[name]">
+					</div>
+				</div>
+
+				<div class="control-group">
+					<label class="control-label" for="inputEmail">Email</label>
+					<div class="controls">
+						<input type="text" name="parent[email]">
+					</div>
+				</div>
+
+				<hr>
+
+				<h4>Children</h4>
+
+				<table class="table table-striped">
+					<tbody>
+						<tr>
+							<td>
+								<input type="text" class="span2" placeholder="Name" name="name[]">
+							</td>
+							<td>
+								<select name="grade[]" class="span3">
+				              		<option value="">Grade...</option>
+				              		<option <?php echo ($child['grade'] == "Under 4" ? "selected" : "") ?>>Under 4</option>
+				              		<option <?php echo ($child['grade'] == "Pre-Kindergarten" ? "selected" : "") ?>>Pre-Kindergarten</option>
+				              		<option <?php echo ($child['grade'] == "Kindergarten" ? "selected" : "") ?>>Kindergarten</option>
+				              		<option <?php echo ($child['grade'] == "1st Grade" ? "selected" : "") ?>>1st Grade</option>
+				              		<option <?php echo ($child['grade'] == "2nd Grade" ? "selected" : "") ?>>2nd Grade</option>
+				              		<option <?php echo ($child['grade'] == "3rd Grade" ? "selected" : "") ?>>3rd Grade</option>
+				              		<option <?php echo ($child['grade'] == "4th Grade" ? "selected" : "") ?>>4th Grade</option>
+				              		<option <?php echo ($child['grade'] == "5th Grade" ? "selected" : "") ?>>5th Grade</option>
+				              		<option <?php echo ($child['grade'] == "6th Grade" ? "selected" : "") ?>>6th Grade</option>
+				              		<option <?php echo ($child['grade'] == "7th Grade" ? "selected" : "") ?>>7th Grade</option>
+				              		<option <?php echo ($child['grade'] == "8th Grade" ? "selected" : "") ?>>8th Grade</option>
+				              		<option <?php echo ($child['grade'] == "9th Grade" ? "selected" : "") ?>>9th Grade</option>
+				              		<option <?php echo ($child['grade'] == "10th Grade" ? "selected" : "") ?>>10th Grade</option>
+				              		<option <?php echo ($child['grade'] == "11th Grade" ? "selected" : "") ?>>11th Grade</option>
+				              		<option <?php echo ($child['grade'] == "12th Grade" ? "selected" : "") ?>>12th Grade</option>
+				              		<option <?php echo ($child['grade'] == "Adult" ? "selected" : "") ?>>Adult</option>
+				              	</select>
+							</td>
+							<td>
+								<input type="text" class="span2" placeholder="Birthdate"  name="birthdate[]">
+							</td>
+						</tr>
+						<tr>
+							<td>
+								<input type="text" class="span2" placeholder="Name" name="name[]">
+							</td>
+							<td>
+								<select name="grade[]" class="span3">
+				              		<option value="">Grade...</option>
+				              		<option <?php echo ($child['grade'] == "Under 4" ? "selected" : "") ?>>Under 4</option>
+				              		<option <?php echo ($child['grade'] == "Pre-Kindergarten" ? "selected" : "") ?>>Pre-Kindergarten</option>
+				              		<option <?php echo ($child['grade'] == "Kindergarten" ? "selected" : "") ?>>Kindergarten</option>
+				              		<option <?php echo ($child['grade'] == "1st Grade" ? "selected" : "") ?>>1st Grade</option>
+				              		<option <?php echo ($child['grade'] == "2nd Grade" ? "selected" : "") ?>>2nd Grade</option>
+				              		<option <?php echo ($child['grade'] == "3rd Grade" ? "selected" : "") ?>>3rd Grade</option>
+				              		<option <?php echo ($child['grade'] == "4th Grade" ? "selected" : "") ?>>4th Grade</option>
+				              		<option <?php echo ($child['grade'] == "5th Grade" ? "selected" : "") ?>>5th Grade</option>
+				              		<option <?php echo ($child['grade'] == "6th Grade" ? "selected" : "") ?>>6th Grade</option>
+				              		<option <?php echo ($child['grade'] == "7th Grade" ? "selected" : "") ?>>7th Grade</option>
+				              		<option <?php echo ($child['grade'] == "8th Grade" ? "selected" : "") ?>>8th Grade</option>
+				              		<option <?php echo ($child['grade'] == "9th Grade" ? "selected" : "") ?>>9th Grade</option>
+				              		<option <?php echo ($child['grade'] == "10th Grade" ? "selected" : "") ?>>10th Grade</option>
+				              		<option <?php echo ($child['grade'] == "11th Grade" ? "selected" : "") ?>>11th Grade</option>
+				              		<option <?php echo ($child['grade'] == "12th Grade" ? "selected" : "") ?>>12th Grade</option>
+				              		<option <?php echo ($child['grade'] == "Adult" ? "selected" : "") ?>>Adult</option>
+				              	</select>
+							</td>
+							<td>
+								<input type="text" class="span2" placeholder="Birthdate"  name="birthdate[]">
+							</td>
+						</tr>
+						<tr>
+							<td>
+								<input type="text" class="span2" placeholder="Name" name="name[]">
+							</td>
+							<td>
+								<select name="grade[]" class="span3">
+				              		<option value="">Grade...</option>
+				              		<option <?php echo ($child['grade'] == "Under 4" ? "selected" : "") ?>>Under 4</option>
+				              		<option <?php echo ($child['grade'] == "Pre-Kindergarten" ? "selected" : "") ?>>Pre-Kindergarten</option>
+				              		<option <?php echo ($child['grade'] == "Kindergarten" ? "selected" : "") ?>>Kindergarten</option>
+				              		<option <?php echo ($child['grade'] == "1st Grade" ? "selected" : "") ?>>1st Grade</option>
+				              		<option <?php echo ($child['grade'] == "2nd Grade" ? "selected" : "") ?>>2nd Grade</option>
+				              		<option <?php echo ($child['grade'] == "3rd Grade" ? "selected" : "") ?>>3rd Grade</option>
+				              		<option <?php echo ($child['grade'] == "4th Grade" ? "selected" : "") ?>>4th Grade</option>
+				              		<option <?php echo ($child['grade'] == "5th Grade" ? "selected" : "") ?>>5th Grade</option>
+				              		<option <?php echo ($child['grade'] == "6th Grade" ? "selected" : "") ?>>6th Grade</option>
+				              		<option <?php echo ($child['grade'] == "7th Grade" ? "selected" : "") ?>>7th Grade</option>
+				              		<option <?php echo ($child['grade'] == "8th Grade" ? "selected" : "") ?>>8th Grade</option>
+				              		<option <?php echo ($child['grade'] == "9th Grade" ? "selected" : "") ?>>9th Grade</option>
+				              		<option <?php echo ($child['grade'] == "10th Grade" ? "selected" : "") ?>>10th Grade</option>
+				              		<option <?php echo ($child['grade'] == "11th Grade" ? "selected" : "") ?>>11th Grade</option>
+				              		<option <?php echo ($child['grade'] == "12th Grade" ? "selected" : "") ?>>12th Grade</option>
+				              		<option <?php echo ($child['grade'] == "Adult" ? "selected" : "") ?>>Adult</option>
+				              	</select>
+							</td>
+							<td>
+								<input type="text" class="span2" placeholder="Birthdate"  name="birthdate[]">
+							</td>
+						</tr>
+					</tbody>
+				</table>
+
+			</div>
+			<div class="modal-footer">
+				<a class="btn" data-dismiss="modal" aria-hidden="true">Close</a>
+				<button class="btn btn-primary">Add User</button>
+			</div>
+		</form>
+	</div>
 	<?php } ?>
 
 </div>
-
